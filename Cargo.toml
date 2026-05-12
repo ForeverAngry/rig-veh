@@ -1,0 +1,61 @@
+[package]
+name = "rig-veh"
+version = "0.2.0"
+edition = "2024"
+rust-version = "1.89"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+description = "Verifiable Evolutionary Hyperagent — Git for cognition. Cryptographic identity, lineage DAG, policy-gated mutation, and sandboxed evaluation for rig agents."
+repository = "https://github.com/ForeverAngry/rig-veh"
+authors = ["ForeverAngry"]
+keywords = ["rig", "agent", "evolution", "pki", "governance"]
+categories = ["asynchronous", "cryptography"]
+
+[features]
+default = []
+rag = ["dep:rig-evals-rag", "dep:futures"]
+jsonl-ledger = []
+dot-export = []
+
+[dependencies]
+rig-compose = { path = "../rig-compose", features = ["manifest"] }
+rig-evals-rag = { path = "../rig-evals-rag", optional = true }
+futures = { version = "0.3", optional = true }
+
+async-trait = "0.1"
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+hex = "0.4"
+parking_lot = "0.12"
+rand_core = { version = "0.6", features = ["getrandom"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+similar = "2"
+thiserror = "2"
+time = { version = "0.3", features = ["serde", "formatting", "parsing"] }
+tracing = "0.1"
+uuid = { version = "1", features = ["v4", "serde"] }
+
+[dev-dependencies]
+anyhow = "1"
+tempfile = "3"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[lints.clippy]
+dbg_macro = "forbid"
+await_holding_lock = "deny"
+await_holding_refcell_ref = "deny"
+expect_used = "deny"
+expect_fun_call = "deny"
+indexing_slicing = "deny"
+panic = "deny"
+panic_in_result_fn = "deny"
+todo = "forbid"
+unimplemented = "forbid"
+unreachable = "deny"
+unwrap_used = "deny"
+
+[profile.release]
+lto = true
+opt-level = "s"
