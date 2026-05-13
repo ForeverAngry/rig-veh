@@ -72,8 +72,8 @@ fn manifest_with_tools(name: &str, tools: &[&str]) -> AgentManifest {
 #[tokio::test]
 #[ignore = "requires a running Ollama server and OLLAMA_MODEL"]
 async fn live_ollama_evaluator_drives_promotion_and_approval() {
-    let model =
-        std::env::var("OLLAMA_MODEL").unwrap_or_else(|_| "liquidai/lfm2.5-1.2b-instruct:latest".to_string());
+    let model = std::env::var("OLLAMA_MODEL")
+        .unwrap_or_else(|_| "liquidai/lfm2.5-1.2b-instruct:latest".to_string());
     let ledger = Arc::new(InMemoryLineage::new());
     let evaluator = Arc::new(OllamaEvaluator { model });
     let runner_key = SigningKey::generate(&mut OsRng);

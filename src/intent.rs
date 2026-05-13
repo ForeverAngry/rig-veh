@@ -62,6 +62,46 @@ impl MutationIntent {
         self.constraints.push(tag.into());
         self
     }
+
+    /// Construct a signed-rollback intent that targets a previously
+    /// committed node.
+    ///
+    /// The `target_id` is folded into the canonical artifact bytes via
+    /// `metadata.rollback_target`, so the rollback is itself part of
+    /// the signed ledger entry and cannot be retargeted after the fact
+    /// without breaking the signature.
+    ///
+    /// ```
+    /// use rig_veh::MutationIntent;
+    ///
+    /// let intent = MutationIntent::rollback("sha256:abc");
+    /// assert_eq!(intent.goal, "rollback");
+    /// assert_eq!(
+    ///     intent.metadata.get("rollback_target").and_then(|v| v.as_str()),
+    ///     Some("sha256:abc"),
+    /// );
+    /// ```
+    pub fn rollback(target_id: impl Into<String>) -> Self {
+        let target = target_id.into();
+        Self {
+            goal: "rollback".into(),
+            rationale: format!("revert to {target}"),
+            expected_improvement: None,
+            constraints: Vec::new(),
+            metadata: serde_json::json!({ "rollback_target": target }),
+        }
+    }
+
+    /// If this intent is a [`MutationIntent::rollback`], return the
+    /// target `agent_id` it points at.
+    pub fn rollback_target(&self) -> Option<&str> {
+        if self.goal != "rollback" {
+            return None;
+        }
+        self.metadata
+            .get("rollback_target")
+            .and_then(|v| v.as_str())
+    }
 }
 
 /// Hard governance boundaries inherited by all descendants of a node.

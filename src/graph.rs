@@ -330,6 +330,61 @@ impl Veh {
         self.ledger.set_head(&agent_id.to_string()).await
     }
 
+    /// Append a signed rollback event that reverts the active head to
+    /// `target_id`'s artifact while preserving history.
+    ///
+    /// Unlike [`Veh::rollback_to`] (which only moves the head pointer),
+    /// this method emits a brand-new signed [`AgentNode`] whose parent
+    /// is the current head and whose [`MutationIntent`] records the
+    /// rollback target via [`MutationIntent::rollback`]. The new node's
+    /// artifact mirrors `target_id`'s artifact, so callers can roll
+    /// forward, roll back, and keep an auditable signed trail of every
+    /// transition.
+    ///
+    /// The target must verify and must be `Promoted`. The new node is
+    /// signed with the runner's signing key.
+    pub async fn commit_rollback(
+        &self,
+        target_id: &str,
+        created_at: impl Into<String>,
+    ) -> Result<AgentNode> {
+        let target = self.ledger.get(&target_id.to_string()).await?;
+        crate::identity::verify_node(&target)?;
+        if !matches!(target.status, NodeStatus::Promoted) {
+            return Err(Error::PolicyDenied(format!(
+                "cannot roll back to non-promoted node {target_id}"
+            )));
+        }
+
+        let parent_id = self
+            .ledger
+            .head()
+            .await?
+            .ok_or_else(|| Error::Ledger("ledger has no head; nothing to roll back".into()))?;
+        let parent = self.ledger.get(&parent_id).await?;
+
+        let intent = MutationIntent::rollback(target_id);
+        let allowed_scope = target.allowed_scope.clone();
+        let created = created_at.into();
+        let inputs = CommitInputs {
+            parent_id: Some(&parent.agent_id),
+            generation: parent.generation + 1,
+            created_at: &created,
+            mutation_intent: &intent,
+            mutation_diff: "",
+            allowed_scope: &allowed_scope,
+            eval_results: None,
+            artifact: &target.artifact,
+            status: NodeStatus::Promoted,
+            parent_agent_success: true,
+            valid_parent: true,
+            eval_stage: None,
+        };
+        let node = sign_node(&inputs, &self.signing_key)?;
+        self.ledger.append(node.clone()).await?;
+        Ok(node)
+    }
+
     #[allow(clippy::too_many_arguments)]
     async fn commit_promoted(
         &self,
