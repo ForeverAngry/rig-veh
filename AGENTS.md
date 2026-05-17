@@ -61,7 +61,10 @@ Integration tests live in [tests/](tests/). Examples must keep building:
 
 Do not depend on `rig-memvid`, `rig-resources`, or `rig-mcp` — this
 crate has to evaluate agents built on top of all of them. Do not vendor
-`rig-core` or `rig-compose`. Update [README.md](README.md) and
+`rig-core` or `rig-compose`. The optional `rag` feature intentionally
+pulls `rig-evals-rag`, which in turn depends on `rig-core` for the
+`VectorStoreIndexDyn` retrieval surface; the default feature set remains
+free of `rig-core`. Update [README.md](README.md) and
 [CHANGELOG.md](CHANGELOG.md) for user-visible changes.
 
 ## `graph-flow`

@@ -12,7 +12,9 @@ before they are committed.
 The crate is runtime-agnostic, library-only, and depends only on
 [`rig-compose`](https://crates.io/crates/rig-compose) for the
 `AgentManifest` schema. A `rig-evals-rag` adapter ships behind feature
-`rag` for retrieval-quality scoring.
+`rag` for retrieval-quality scoring; that feature intentionally brings in
+`rig-core` transitively through `rig-evals-rag` because the adapter works
+against Rig's `VectorStoreIndexDyn` retrieval surface.
 
 The crate-local maturity plan lives in [ROADMAP.md](ROADMAP.md). Cross-crate
 coordination lives in
