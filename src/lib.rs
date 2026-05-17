@@ -92,7 +92,7 @@ pub use error::{Error, Result};
 pub use evaluator::{
     CompositeEvaluator, EvalResult, EvalStage, Evaluator, StagedResult, StubEvaluator,
 };
-pub use evidence::{EVIDENCE_BUNDLE_VERSION, EvidenceBundle, OperatorApproval, PolicyVerdict};
+pub use evidence::{AuditRecord, EVIDENCE_BUNDLE_VERSION, EvidenceBundle, OperatorApproval, PolicyVerdict};
 pub use evolution::EvolutionDriver;
 pub use graph::{CycleInputs, CycleOutcome, PendingApproval, Veh};
 pub use identity::{CommitInputs, compute_agent_id, decode_verifying_key, sign_node, verify_node};

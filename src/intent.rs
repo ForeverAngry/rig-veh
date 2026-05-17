@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize};
 /// `agent_id` hash, so any tampering with `goal` or `constraints` after
 /// the fact will be detected by [`crate::identity::verify_node`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq)]
 pub struct MutationIntent {
     /// Short human-readable label (e.g. `"improve_recall_at_10"`).
     pub goal: String,

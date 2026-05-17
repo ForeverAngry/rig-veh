@@ -181,7 +181,7 @@ impl EvidenceBundle {
     /// Render the bundle as a canonical JSON `Value` suitable for
     /// stashing in [`crate::node::AgentNode::eval_results`].
     ///
-    /// # Errors
+    /// #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]Errors
     ///
     /// Returns [`Error`] when serde fails (should not happen for the
     /// in-crate types).
@@ -192,7 +192,7 @@ impl EvidenceBundle {
     /// Parse an evidence bundle from a JSON value (typically
     /// [`crate::node::AgentNode::eval_results`]).
     ///
-    /// # Errors
+    /// #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]Errors
     ///
     /// Returns [`Error`] when the value does not deserialize into an
     /// [`EvidenceBundle`].
@@ -250,5 +250,66 @@ mod tests {
         assert!(!json.contains("evaluator_report"));
         assert!(!json.contains("context_items"));
         assert!(!json.contains("operator_approvals"));
+    }
+}
+
+use crate::node::{AgentId, AgentNode};
+use crate::intent::MutationIntent;
+use crate::identity::verify_node;
+
+/// First-class audit evidence bundle capturing the full lineage transition
+/// in a single verifiable record. This projection satisfies the objective
+/// to provide auditors with a single struct containing the hash chain,
+/// evaluation results, policy decision, and cryptographic proof.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct AuditRecord {
+    /// The node's primary identifier (SHA-256 hash).
+    pub agent_id: AgentId,
+    /// The parent's identifier, if any.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<AgentId>,
+    /// RFC 3339 timestamp of the mutation.
+    pub timestamp: String,
+    /// The declared intent behind the mutation.
+    pub mutation_intent: MutationIntent,
+    /// The unified-diff string of the manifest changes.
+    pub mutation_diff: String,
+    /// The unpacked evidence bundle (verdict, eval report, approvals).
+    pub evidence: EvidenceBundle,
+    /// Hex-encoded Ed25519 public key of the signer.
+    pub signer_public_key: String,
+    /// Hex-encoded Ed25519 signature.
+    pub signature: String,
+    /// Whether the node's hash and signature cryptographically verify.
+    pub verification_valid: bool,
+}
+
+impl AuditRecord {
+    /// Project an [`AgentNode`] into an [`AuditRecord`], unpacking its
+    /// evidence bundle and verifying its signature cryptographically.
+    ///
+    /// #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]Errors
+    ///
+    /// Returns [`Error`] if the node's `eval_results` cannot be parsed
+    /// as an [`EvidenceBundle`].
+    pub fn from_node(node: &AgentNode) -> Result<Self> {
+        let evidence = match &node.eval_results {
+            Some(val) => EvidenceBundle::from_value(val)?,
+            None => EvidenceBundle::new(PolicyVerdict::approved("legacy_or_root")),
+        };
+        
+        let verified = verify_node(node).is_ok();
+        
+        Ok(Self {
+            agent_id: node.agent_id.clone(),
+            parent_id: node.parent_id.clone(),
+            timestamp: node.created_at.clone(),
+            mutation_intent: node.mutation_intent.clone(),
+            mutation_diff: node.mutation_diff.clone(),
+            evidence,
+            signer_public_key: node.signer_public_key.clone(),
+            signature: node.signature.clone(),
+            verification_valid: verified,
+        })
     }
 }
