@@ -7,7 +7,22 @@ All notable changes to this crate are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this crate adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] — 2025-03-XX
+## [Unreleased]
+
+### Added
+
+- Byte-exact snapshot test ([tests/canonical_snapshot.rs](tests/canonical_snapshot.rs))
+  for `CommitInputs::signing_payload`, the resulting Ed25519 signature, and
+  the canonical-JSON serialisation of `AgentNode`. Pins the load-bearing
+  canonical layout against accidental drift.
+
+### Removed
+
+- **Breaking (pre-publish)**: removed the unused `decode_verifying_key`
+  public re-export and its underlying free function. `verify_node` already
+  performs the equivalent decode inline; no external consumers were found.
+
+## [0.2.0] — Unreleased
 
 ### Added
 

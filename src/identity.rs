@@ -201,16 +201,6 @@ pub fn verify_node(node: &AgentNode) -> Result<()> {
     Ok(())
 }
 
-/// Decode a hex-encoded Ed25519 verifying key.
-pub fn decode_verifying_key(hex_str: &str) -> Result<VerifyingKey> {
-    let bytes = hex::decode(hex_str).map_err(|e| Error::InvalidKey(e.to_string()))?;
-    let array: [u8; 32] = bytes
-        .as_slice()
-        .try_into()
-        .map_err(|_| Error::InvalidKey("wrong key length".into()))?;
-    VerifyingKey::from_bytes(&array).map_err(|e| Error::InvalidKey(e.to_string()))
-}
-
 #[cfg(test)]
 #[allow(
     clippy::unwrap_used,

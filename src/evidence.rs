@@ -253,9 +253,9 @@ mod tests {
     }
 }
 
-use crate::node::{AgentId, AgentNode};
-use crate::intent::MutationIntent;
 use crate::identity::verify_node;
+use crate::intent::MutationIntent;
+use crate::node::{AgentId, AgentNode};
 
 /// First-class audit evidence bundle capturing the full lineage transition
 /// in a single verifiable record. This projection satisfies the objective
@@ -297,9 +297,9 @@ impl AuditRecord {
             Some(val) => EvidenceBundle::from_value(val)?,
             None => EvidenceBundle::new(PolicyVerdict::approved("legacy_or_root")),
         };
-        
+
         let verified = verify_node(node).is_ok();
-        
+
         Ok(Self {
             agent_id: node.agent_id.clone(),
             parent_id: node.parent_id.clone(),
