@@ -92,10 +92,12 @@ pub use error::{Error, Result};
 pub use evaluator::{
     CompositeEvaluator, EvalResult, EvalStage, Evaluator, StagedResult, StubEvaluator,
 };
-pub use evidence::{AuditRecord, EVIDENCE_BUNDLE_VERSION, EvidenceBundle, OperatorApproval, PolicyVerdict};
+pub use evidence::{
+    AuditRecord, EVIDENCE_BUNDLE_VERSION, EvidenceBundle, OperatorApproval, PolicyVerdict,
+};
 pub use evolution::EvolutionDriver;
 pub use graph::{CycleInputs, CycleOutcome, PendingApproval, Veh};
-pub use identity::{CommitInputs, compute_agent_id, decode_verifying_key, sign_node, verify_node};
+pub use identity::{CommitInputs, compute_agent_id, sign_node, verify_node};
 pub use intent::{AllowedScope, MutationIntent};
 pub use ledger::{InMemoryLineage, LineageStore};
 pub use mutator::{MutationContext, Mutator, StaticMutator};

@@ -1,11 +1,13 @@
-use std::sync::Arc;
+#![allow(clippy::unwrap_used, clippy::expect_used)]
+
 use ed25519_dalek::SigningKey;
 use rand_core::OsRng;
 use rig_compose::AgentManifest;
 use rig_veh::{
-    AgentArtifact, AllowedScope, CycleInputs, InMemoryLineage, MutationIntent, 
-    StubEvaluator, Veh, export_dot
+    AgentArtifact, AllowedScope, CycleInputs, InMemoryLineage, MutationIntent, StubEvaluator, Veh,
+    export_dot,
 };
+use std::sync::Arc;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> anyhow::Result<()> {
@@ -16,7 +18,11 @@ async fn main() -> anyhow::Result<()> {
 
     let manifest = AgentManifest::from_yaml("name: root\ntools: []\n").unwrap();
     let root = veh
-        .commit_root(AgentArtifact::new(manifest), AllowedScope::default(), "2026-05-11T00:00:00Z")
+        .commit_root(
+            AgentArtifact::new(manifest),
+            AllowedScope::default(),
+            "2026-05-11T00:00:00Z",
+        )
         .await?;
 
     let candidate_manifest = AgentManifest::from_yaml("name: v2\ntools: []\n").unwrap();
