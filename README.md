@@ -144,7 +144,7 @@ just check
 # fmt --check + clippy --all-features -- -D warnings + cargo test --all-features
 
 # optional live smoke, requires local Ollama and the requested model
-OLLAMA_MODEL=tomng/lfm2.5-instruct:1.2b cargo test --test live_ollama -- --ignored --nocapture
+OLLAMA_MODEL=qwen3.5:9b cargo test --test live_ollama -- --ignored --nocapture
 ```
 
 ## Scope
